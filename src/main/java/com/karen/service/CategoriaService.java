@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.karen.domain.Categoria;
 import com.karen.repository.CategoriaRepository;
+import com.karen.service.exception.ObjectNotFoundException;
 
 @Service
 public class CategoriaService {
@@ -16,7 +17,13 @@ public class CategoriaService {
 	public Categoria buscar(Integer id) {
 		
 		Optional<Categoria> categoria = rep.findById(id);
-		return categoria.orElse(null); 
+		if(categoria == null) {
+			return categoria.orElseThrow(() -> new ObjectNotFoundException(
+					 "Objeto não encontrado! Id: " + id + ", Tipo: " + Categoria.class.getName())); 
+
+		}
+		return categoria.get(); 
+		
 
 	}
 }
