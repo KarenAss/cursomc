@@ -1,5 +1,6 @@
 package com.karen;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,20 @@ import com.karen.domain.Cidade;
 import com.karen.domain.Cliente;
 import com.karen.domain.Endereco;
 import com.karen.domain.Estado;
+import com.karen.domain.Pagamento;
+import com.karen.domain.PagamentoComBoleto;
+import com.karen.domain.PagamentoComCartao;
+import com.karen.domain.Pedido;
 import com.karen.domain.Produto;
+import com.karen.domain.enums.EstadoPagamento;
 import com.karen.domain.enums.TipoCliente;
 import com.karen.repository.CategoriaRepository;
 import com.karen.repository.CidadeRepository;
 import com.karen.repository.ClienteRepository;
 import com.karen.repository.EnderecoRepository;
 import com.karen.repository.EstadoRepository;
+import com.karen.repository.PagamentoRepository;
+import com.karen.repository.PedidoRepository;
 import com.karen.repository.ProdutoRepository;
 
 @SpringBootApplication
@@ -36,6 +44,10 @@ public class CursomcApplication implements CommandLineRunner {
 	private EnderecoRepository end;
 	@Autowired
 	private ClienteRepository cli;
+	@Autowired
+	private PagamentoRepository pag;
+	@Autowired
+	private PedidoRepository ped;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
@@ -85,6 +97,21 @@ public class CursomcApplication implements CommandLineRunner {
 		
 		cli.saveAll(Arrays.asList(cli1));
 		end.saveAll(Arrays.asList(e1,e2));
+		
+		SimpleDateFormat sim = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		Pedido ped1 = new Pedido(null,sim.parse("30/09/2017 10:32"),cli1,e1);
+		Pedido ped2 = new Pedido(null, sim.parse("10/10/2017 19:35"),cli1,e2);
+		
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO,ped1,6);
+		ped1.setPagamento(pagto1);
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE,ped2,sim.parse("20/10/2017 00:00"),null);
+		ped2.setPagamento(pagto2);
+		
+		cli1.getPedidos().addAll(Arrays.asList(ped1,ped2));
+		
+		
+		ped.saveAll(Arrays.asList(ped1,ped2));
+		pag.saveAll(Arrays.asList(pagto1,pagto2));
 		
 	}
 
